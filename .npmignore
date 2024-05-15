@@ -1,0 +1,8 @@
+src/
+.eslintrc.json
+.jsdoc.json
+.editorconfig
+.yarn
+a.js
+wordcloud.png
+docs/

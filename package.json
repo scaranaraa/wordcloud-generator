@@ -1,0 +1,30 @@
+{
+  "name": "wordcloud-generator",
+  "version": "1.0.0",
+  "description": "A wordcloud generator for nodejs",
+  "main": "dist/index.js",
+  "types": "types.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/scaranaraa/wordcloud-generator.git"
+  },
+  "keywords": [
+    "wordcloud",
+    "chart",
+    "graph"
+  ],
+  "type": "module",
+  "author": "scaranaraa",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/scaranaraa/wordcloud-generator/issues"
+  },
+  "homepage": "https://github.com/scaranaraa/wordcloud-generator#readme",
+  "packageManager": "yarn@4.2.2",
+  "dependencies": {
+    "puppeteer": "^22.8.2"
+  }
+}
