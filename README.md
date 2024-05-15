@@ -38,10 +38,9 @@ await generate(words, true, "wordcloud.png")
 ```js
 import {generate} from "wordcloud-generator";
 
-const words = {
-  "word1": 10,
-  "word2": 20,
-  "word3": 30,
-};
+const words = new Map()
+words.set("abc",10)
+words.set("def",20)
+words.set("ghi",30)
 await generate(words, true, "wordcloud.png")
 ```

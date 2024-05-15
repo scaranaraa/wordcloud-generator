@@ -38,7 +38,7 @@ export async function generate(words: string | string[] | Map<string, number> , 
                 const frequency = wordsMap.get(word) || 0;
                 wordsMap.set(word, frequency + 1);
             }
-        } else if (words instanceof Map) {
+        } else {
             wordsMap = words;
         }
 
