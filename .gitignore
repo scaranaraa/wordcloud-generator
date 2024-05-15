@@ -66,7 +66,6 @@ web_modules/
 # Optional REPL history
 .node_repl_history
 a.js
-wordcloud.png
 
 # Output of 'npm pack'
 *.tgz
