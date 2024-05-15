@@ -38,8 +38,10 @@ export async function generate(words: string | string[] | Map<string, number> , 
                 const frequency = wordsMap.get(word) || 0;
                 wordsMap.set(word, frequency + 1);
             }
-        } else {
+        } else if (words instanceof Map){
             wordsMap = words;
+        } else{
+            throw new Error('Invalid input type. Expected string or string[] or Map<string, number>');
         }
 
         const wordsObj: { text: string; size: number }[] = [] 
