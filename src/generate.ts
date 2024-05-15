@@ -32,7 +32,7 @@ export async function generate(words: string | string[] | Map<string, number> , 
                 const frequency = wordsMap.get(word) || 0;
                 wordsMap.set(word, frequency + 1);
             }
-        } else if (words instanceof String) {
+        } else if (typeof words === 'string') {
             words = words.split(' ');
             for(let word of words){
                 const frequency = wordsMap.get(word) || 0;
