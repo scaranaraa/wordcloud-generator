@@ -1,6 +1,6 @@
 {
   "name": "wordcloud-generator",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A wordcloud generator for nodejs",
   "main": "dist/index.js",
   "types": "types.d.ts",
