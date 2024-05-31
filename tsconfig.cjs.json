@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2018",                                   
+    "module": "CommonJS",                                
+    "outDir": "./dist",
+    "esModuleInterop": true,   
+    "declaration": true,                            
+    "forceConsistentCasingInFileNames": true,            
+    "strict": true,                   
+    "inlineSourceMap": false,               
+    "skipLibCheck": true ,                               
+    "rootDir": "./src",
+  },
+  "include": ["types.d.ts", "src/**/*.ts"]
+}
