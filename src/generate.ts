@@ -1,5 +1,28 @@
 import { launch } from 'puppeteer';
 
+interface Options {
+    puppeteerPath?: string;
+    viewportWidth?: number;
+    viewportHeight?: number;
+    minSize?: number;
+    maxSize?: number;
+    backgroundColor?: string;
+    font?: string;
+    padding?: number;
+}
+
+const defaultOpts: Options = {
+    puppeteerPath: undefined,
+    viewportWidth: 800,
+    viewportHeight: 400,
+    minSize: 10,
+    maxSize: 100,
+    backgroundColor: "#f0f0f0",
+    font: "Impact",
+    padding: 5
+};
+
+
 /**
  * 
  * @param words Array of strings or Map of strings and frequencies
@@ -8,21 +31,9 @@ import { launch } from 'puppeteer';
  * @param opts Other options
  */
 
-export async function generate(words: string | string[] | Map<string, number> , normalize: boolean = true, savePath: string = 'wordcloud.png' ,opts : 
-    {
-    minSize: number,
-    maxSize: number,
-    backgroundColor: string,
-    font : string,
-    padding : number,
-    } = {
-        minSize: 10,
-        maxSize: 100,
-        backgroundColor: "#f0f0f0",
-        font: "Impact",
-        padding: 5,
-
-    }) {
+export async function generate(words: string | string[] | Map<string, number> , normalize: boolean = true, savePath: string = 'wordcloud.png' ,opts : Options = {}) 
+{
+        opts = { ...defaultOpts, ...opts };
 
        
         let wordsMap : Map<string, number> = new Map();
@@ -56,7 +67,12 @@ export async function generate(words: string | string[] | Map<string, number> , 
         const maxFreq = Math.max(...wordsObj.map(w => w.size || 0));
 
         const normalizeFunc = (frequency: number) => {
-            return opts.minSize + (opts.maxSize - opts.minSize) * (Math.log(frequency) - Math.log(minFreq)) / (Math.log(maxFreq) - Math.log(minFreq));
+            if(normalize) {
+                return opts.minSize + (opts.maxSize - opts.minSize) * (Math.log(frequency) - Math.log(minFreq)) / (Math.log(maxFreq) - Math.log(minFreq));
+            }
+            else{
+                return frequency
+            }
         };
 
         const normalizedWords = normalize ? wordsObj.map(word => ({
@@ -65,7 +81,7 @@ export async function generate(words: string | string[] | Map<string, number> , 
         })) : wordsObj;
     
 
-        const generateWordCloudHTML = (words: { text: string; size: number}[], backgroundColor: string, font: string, padding: number) => {
+        const generateWordCloudHTML = (words: { text: string; size: number}[], backgroundColor: string, font: string, padding: number, viewportWidth: number, viewportHeight: number) => {
             return `
                 <!DOCTYPE html>
                 <html lang="en">
@@ -85,32 +101,34 @@ export async function generate(words: string | string[] | Map<string, number> , 
                             background-color: ${backgroundColor};
                         }
                         svg {
-                            width: 100%;
-                            height: 100%;
+                            /* width: 100%;
+                            height: 100%; */
                         }
                     </style>
                 </head>
                 <body>
                     <script>
                         const words = ${JSON.stringify(words)};
-                        
+                        const viewportWidth = ${viewportWidth};
+                        const viewportHeight = ${viewportHeight};
+        
                         const layout = d3.layout.cloud()
-                            .size([800, 400])
+                            .size([viewportWidth, viewportHeight])
                             .words(words.map(word => ({text: word.text, size: word.size})))
                             .padding(${padding})
                             .rotate(() => ~~(Math.random() * 2) * 90)
                             .font("${font}")
                             .fontSize(d => d.size)
                             .on("end", draw);
-    
+        
                         layout.start();
-    
+        
                         function draw(words) {
                             d3.select("body").append("svg")
-                                .attr("width", layout.size()[0])
-                                .attr("height", layout.size()[1])
+                                .attr("width", viewportWidth)
+                                .attr("height", viewportHeight)
                                 .append("g")
-                                .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+                                .attr("transform", "translate(" + viewportWidth / 2 + "," + viewportHeight / 2 + ")") 
                                 .selectAll("text")
                                 .data(words)
                                 .enter().append("text")
@@ -118,7 +136,7 @@ export async function generate(words: string | string[] | Map<string, number> , 
                                 .style("font-family", "Impact")
                                 .style("fill", (d, i) => d3.schemeCategory10[i % 10])
                                 .attr("text-anchor", "middle")
-                                .attr("transform", d => "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")")
+                                .attr("transform", d => "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")") 
                                 .text(d => d.text);
                         }
                     </script>
@@ -126,13 +144,25 @@ export async function generate(words: string | string[] | Map<string, number> , 
                 </html>
             `;
         };
-    
-        const browser = await launch({headless: true});
+
+        let browser;
+        if(opts.puppeteerPath) {
+             browser = await launch({headless:true, executablePath: opts.puppeteerPath,args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox'
+                ],
+            });
+        }
+        else browser = await launch({headless: true,args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox'
+            ],  
+        });
         const page = await browser.newPage();
-    
-        await page.setContent(generateWordCloudHTML(normalizedWords, opts.backgroundColor, opts.font, opts.padding));
-    
-        await page.setViewport({ width: 800, height: 400 });
+        const content = generateWordCloudHTML(normalizedWords, opts.backgroundColor, opts.font, opts.padding, opts.viewportWidth, opts.viewportHeight)
+        await page.setContent(content);
+
+        await page.setViewport({ width: opts.viewportWidth, height: opts.viewportHeight });
         await page.screenshot({ path: savePath });
     
         await browser.close();

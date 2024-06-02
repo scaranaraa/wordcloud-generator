@@ -3,6 +3,7 @@ src/
 .jsdoc.json
 .editorconfig
 .yarn
+node_modules
 a.js
 wordcloud.png
 docs/
